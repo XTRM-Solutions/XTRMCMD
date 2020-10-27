@@ -44,6 +44,10 @@ var Flags struct {
 
 func InitFlags() {
 
+	// Example command line:
+	// XTRMPAY --payee nathan@xtrm.com --currency USD --amount 4.53  \
+	//      --firstname Jean-Paul --lastname Dough --description "Money Test" --debug true
+
 	Flags.Payee = flag.StringP("payee", "p", "nathan@xtrm.com", "email address of payee")
 	Flags.Currency = flag.StringP("currency", "c", "USD", "Currency to pay")
 	Flags.Amount = flag.StringP("amount", "a", "4.53", "Amount to pay")

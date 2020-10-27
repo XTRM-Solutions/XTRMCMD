@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type tokenResponse struct {
@@ -19,8 +21,40 @@ type tokenResponse struct {
 	Expires      string `json:".expires"`
 }
 
+func isTokenActive(duration time.Duration) (active bool) {
+
+	// Do we already have an access token good for at least 2 hours?
+	if "" != xData["AccessToken"] {
+		// is it current?
+		expires := xData["Expires"]
+		if "" != expires {
+			// XTRM time example: "Wed, 28 Oct 2020 20:15:16 GMT"
+			xtrmTimeFormat := "Mon, 02 Jan 2006 15:04:05 MST"
+
+			timeExpires, err := time.Parse(xtrmTimeFormat, expires)
+			if nil != err {
+				fmt.Println("Internal error: could not parse time [ " +
+					expires + "] as format [ " +
+					xtrmTimeFormat + " ]\n\tbecause\n" +
+					err.Error())
+				os.Exit(5)
+			}
+			if timeExpires.After(time.Now().Add(duration)) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func xAuthorize(xmethod, xurl, xclient, xsecret string) (success bool) {
 
+	if isTokenActive((2 * time.Hour)) {
+		return true
+	}
+
+	// otherwise need to authorize
+	// don't see any point in using token refresh
 	payload := strings.NewReader("grant_type=password" +
 		"&client_id=" + xclient +
 		"&client_secret=" + xsecret)
