@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectCodeStyleConfiguration">
+    <option name="PREFERRED_PROJECT_CODE_STYLE" value="Default" />
+    <code_scheme name="Project" version="173">
+      <HTMLCodeStyleSettings>
+        <option name="HTML_ENFORCE_QUOTES" value="true" />
+      </HTMLCodeStyleSettings>
+      <codeStyleSettings language="HTML">
+        <indentOptions>
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="6" />
+          <option name="TAB_SIZE" value="2" />
+        </indentOptions>
+      </codeStyleSettings>
+    </code_scheme>
+  </component>
+</project>
