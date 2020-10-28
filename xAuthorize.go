@@ -2,10 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -33,11 +31,10 @@ func isTokenActive(duration time.Duration) (active bool) {
 
 			timeExpires, err := time.Parse(xtrmTimeFormat, expires)
 			if nil != err {
-				fmt.Println("Internal error: could not parse time [ " +
+				xLog.Fatal("Internal error: could not parse time [ " +
 					expires + "] as format [ " +
 					xtrmTimeFormat + " ]\n\tbecause\n" +
 					err.Error())
-				os.Exit(5)
 			}
 			if timeExpires.After(time.Now().Add(duration)) {
 				return true
@@ -63,31 +60,26 @@ func xAuthorize(xmethod, xurl, xclient, xsecret string) (success bool) {
 	req, err := http.NewRequest(xmethod, xurl, payload)
 
 	if err != nil {
-		fmt.Println(err)
+		xLog.Fatal(err.Error())
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	res, err := client.Do(req)
 	if nil != err {
-		fmt.Println(err.Error())
-		return
+		xLog.Fatal(err.Error())
 	}
 
 	defer DeferError(res.Body.Close)
 
 	xbody, err := ioutil.ReadAll(res.Body)
 	if nil != err {
-		fmt.Println(err.Error())
-		return
+		xLog.Fatal(err.Error())
 	}
 
 	var tr tokenResponse
 	err = json.Unmarshal(xbody, &tr)
 	if nil != err {
-		if *Flags.Debug {
-			fmt.Println("Internal error: unmarshal error in TokenResponse: " + err.Error())
-		}
-		return false
+		xLog.Fatal(err.Error())
 	}
 	/*
 		AccessToken  string `json:"access_token"`

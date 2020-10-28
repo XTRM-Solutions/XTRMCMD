@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"github.com/go-ini/ini"
 	flag "github.com/spf13/pflag"
-	"os"
 )
 
 var cfg *ini.File
@@ -63,13 +61,16 @@ func InitConfig() {
 	var err error
 	cfg, err = ini.Load("xtrm.ini")
 	if nil != err {
-		fmt.Printf("Fail to read file [xtrm.ini] : %s\n", err.Error())
-		os.Exit(1)
+		xLog.Printf("Fail to read file [xtrm.ini] : %s\n", err.Error())
+		xLog.Fatal(" ... exiting ")
 	}
 
 	xData["currentSection"] = cfg.Section(ini.DefaultSection).Key("currentSection").String()
 
 	xsec, err := cfg.GetSection(xData["currentSection"])
+	if nil != err {
+		xLog.Print(err.Error())
+	}
 
 	for _, v := range requiredKeys {
 		loadKey(xsec, true, v)
@@ -85,9 +86,8 @@ func writeCurrentSectionKeys() {
 	xsec, err := cfg.GetSection(currentSection)
 
 	if nil != err {
-		fmt.Println("internal error: no configuration section [" +
+		xLog.Fatal("internal error: no configuration section [" +
 			currentSection + "]")
-		os.Exit(3)
 	}
 
 	for _, v := range optionalKeys {
@@ -96,7 +96,7 @@ func writeCurrentSectionKeys() {
 		if ok {
 			_, err = xsec.NewKey(v, val)
 			if nil != err {
-				fmt.Println("Internal error: could not set " + "" +
+				xLog.Fatal("Internal error: could not set " + "" +
 					"ini file key [" + v + "] to [" + val + "]")
 			}
 		}
@@ -104,21 +104,22 @@ func writeCurrentSectionKeys() {
 
 	err = cfg.SaveTo("xtrm.ini")
 	if nil != err {
-		fmt.Println("Internal error: failed to write config file [xtrm.ini] " + err.Error())
-		os.Exit(4)
+		xLog.Fatal("Internal error: failed to write config file [xtrm.ini] " + err.Error())
+
 	}
 }
 
 func loadKey(section *ini.Section, required bool, key string) {
 	if required && !section.HasKey(key) {
 		msgRequiredIniKeys()
-		os.Exit(2)
+		xLog.Fatal("missing required key [" + key + " ] in section [ " +
+			section.Name() + " ]")
 	}
 	xData[key] = section.Key(key).String()
 }
 
 func msgRequiredIniKeys() {
-	_, _ = fmt.Fprintf(os.Stderr, "\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n",
+	xLog.Printf("\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n",
 		"XTRM requires some initialization keys in the file XTRM.INI\n",
 		"an initial file looks something like: (minimal required file)\n\n",
 		"\t[DEFAULT]\n",
@@ -132,5 +133,5 @@ func msgRequiredIniKeys() {
 		"\txDefaultWallet=123456\n",
 		"\nPlease ensure this file exists with the minimum required keys in the XTRM command directory\n",
 		"Please substitute in the correct values from the API integration page in the console application\n",
-		"Please note all keys and values are CASE SENSITIVE")
+		"Please note all keys and values are CASE SENSITIVE as token, secret, and URLs may be case sensitive")
 }

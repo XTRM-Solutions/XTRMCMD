@@ -1,16 +1,40 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
+	"log"
 	"os"
 	// "github.com/spf13/cobra" // not yet
 )
 
+var xLog *log.Logger
+var xLogFile *os.File
+var xLogWriter *bufio.Writer
+
+func InitLog() {
+	var err error
+	xLogFile, err = os.OpenFile("xtrmcmd.log",
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
+		644)
+	if nil != err {
+		fmt.Println("Could not open logging file xtrmcmd.log because " + err.Error())
+	}
+	xLogWriter = bufio.NewWriter(xLogFile)
+	xbf := io.MultiWriter(xLogWriter, os.Stderr)
+	xLog = log.New(xbf, "xtrmcmd: ", log.Lshortfile)
+	xLog.Print("\nStarted logging for XTRMCMD")
+}
+
 func main() {
 
-	InitFlags()
+	InitLog()
+	DeferError(xLogFile.Close)   // happens last
+	DeferError(xLogWriter.Flush) // flush happens before close
 	InitConfig()
+	InitFlags()
 
 	xAuthorize("POST",
 		xData["apiAuthorizeUrl"],
@@ -18,7 +42,7 @@ func main() {
 		xData["xSecret"])
 
 	if *Flags.Debug {
-		fmt.Println("Received access token: " +
+		xLog.Print("Received access token: " +
 			xData["TokenType"] + " " +
 			xData["AccessToken"])
 
@@ -39,8 +63,7 @@ func main() {
 	tResp, err := xTransferDynamic(sendMoney)
 
 	if nil != err {
-		fmt.Println(err.Error())
-		os.Exit(-1)
+		log.Fatal(err.Error())
 	}
 
 	if *Flags.Debug {
@@ -52,7 +75,7 @@ func main() {
 		} else {
 			s = string(jsonData)
 		}
-		fmt.Println(s)
+		xLog.Print(s)
 	}
 
 }
