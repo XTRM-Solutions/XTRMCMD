@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,7 +11,8 @@ import (
 
 var xLog *log.Logger
 var xLogFile *os.File
-var xLogWriter *bufio.Writer
+
+// var xLogWriter *bufio.Writer
 
 func InitLog() {
 	var err error
@@ -22,17 +22,17 @@ func InitLog() {
 	if nil != err {
 		fmt.Println("Could not open logging file xtrmcmd.log because " + err.Error())
 	}
-	xLogWriter = bufio.NewWriter(xLogFile)
-	xbf := io.MultiWriter(xLogWriter, os.Stderr)
+	// xLogWriter = bufio.NewWriter(xLogFile)
+	xbf := io.MultiWriter(xLogFile, os.Stderr)
 	xLog = log.New(xbf, "xtrmcmd: ", log.Lshortfile)
 	xLog.Print("\nStarted logging for XTRMCMD")
 }
 
 func main() {
-
 	InitLog()
-	DeferError(xLogFile.Close)   // happens last
-	DeferError(xLogWriter.Flush) // flush happens before close
+	defer DeferError(xLogFile.Close)
+	// defer DeferError(xLogWriter.Flush)
+
 	InitConfig()
 	InitFlags()
 
