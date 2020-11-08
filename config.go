@@ -32,7 +32,7 @@ var xData = map[string]string{
 }
 
 var Flags struct {
-	Payee       *string
+	PayeeEmail  *string
 	Currency    *string
 	Amount      *string
 	FirstName   *string
@@ -49,7 +49,7 @@ func InitFlags() {
 	// XTRMPAY --payee nathan@xtrm.com --currency USD --amount 4.53  \
 	//      --firstname Jean-Paul --lastname Dough --description "Money Test" --debug true
 
-	Flags.Payee = flag.StringP("payee", "p", "nathan@xtrm.com", "email address of payee")
+	Flags.PayeeEmail = flag.StringP("payee", "p", "nathan@xtrm.com", "email address of payee")
 	Flags.Currency = flag.StringP("currency", "c", "USD", "Currency to pay")
 	Flags.Amount = flag.StringP("amount", "a", "4.53", "Amount to pay")
 	Flags.FirstName = flag.StringP("firstname", "f", "Jean-Paul", "Payee first name")
@@ -68,6 +68,17 @@ func InitFlags() {
 	}
 }
 
+func loadSection(profile string) (section *ini.Section) {
+	var err error
+	section, err = cfg.GetSection(profile)
+	if nil != err {
+		xLog.Fatal("could not fetch .INI file profile / section [ " +
+			xData["currentSection"] + " ] because: + " +
+			err.Error())
+	}
+	return section
+}
+
 func InitConfig() {
 	var err error
 	cfg, err = ini.Load("xtrm.ini")
@@ -78,11 +89,10 @@ func InitConfig() {
 	}
 
 	xData["currentSection"] = *Flags.Profile
-	xsec, err := cfg.GetSection(xData["currentSection"])
-	if nil != err {
-		xLog.Fatal("could not fetch .INI file profile / section [ " +
-			xData["currentSection"] + " ] because: + " +
-			err.Error())
+	xsec := loadSection(*Flags.Profile)
+	if ini.DefaultSection == *Flags.Profile {
+		loadKey(xsec, "currentSection", true)
+		xsec = loadSection(xData["currentSection"])
 	}
 
 	for _, v := range requiredKeys {

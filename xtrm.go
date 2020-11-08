@@ -31,10 +31,9 @@ func InitLog() {
 func main() {
 	InitLog()
 	defer DeferError(xLogFile.Close)
-	// defer DeferError(xLogWriter.Flush)
 
-	InitConfig()
 	InitFlags()
+	InitConfig()
 
 	xAuthorize("POST",
 		xData["apiAuthorizeUrl"],
@@ -58,12 +57,13 @@ func main() {
 	sm.RecipientFirstName = *Flags.FirstName
 	sm.RecipientLastName = *Flags.LastName
 	sm.Description = *Flags.Description
-	sm.RecipientEmail = *Flags.Payee
+	sm.RecipientEmail = *Flags.PayeeEmail
 
 	tResp, err := xTransferDynamic(sendMoney)
 
 	if nil != err {
 		log.Fatal(err.Error())
+
 	}
 
 	if *Flags.Debug {
@@ -75,7 +75,7 @@ func main() {
 		} else {
 			s = string(jsonData)
 		}
-		xLog.Print(s)
+		log.Fatal(s)
 	}
 
 }
