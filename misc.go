@@ -1,4 +1,4 @@
-package main
+package xtrmcmd
 
 import (
 	"fmt"
@@ -11,6 +11,9 @@ import (
 func DeferError(f func() error) {
 	err := f()
 	if nil != err {
-		_, _ = fmt.Fprintln(os.Stderr, "(may be harmless) deferred error: "+err.Error())
+		_, _ = fmt.Fprintln(
+			os.Stderr,
+			"(may be harmless) error in deferred function: "+err.Error(),
+		)
 	}
 }

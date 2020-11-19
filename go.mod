@@ -1,6 +1,6 @@
-module XTRM
+module xtrm.com/XTRMCMD
 
-go 1.15
+go 1.1
 
 require (
 	github.com/go-ini/ini v1.62.0

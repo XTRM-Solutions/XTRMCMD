@@ -1,4 +1,4 @@
-package main
+package xtrmcmd
 
 import (
 	"fmt"

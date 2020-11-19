@@ -1,9 +1,11 @@
-package main
+package xtrmcmd
 
 import (
+	"fmt"
 	"github.com/go-ini/ini"
 	flag "github.com/spf13/pflag"
 	"os"
+	"path/filepath"
 )
 
 var cfg *ini.File
@@ -81,6 +83,19 @@ func loadSection(profile string) (section *ini.Section) {
 
 func InitConfig() {
 	var err error
+
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	exePath := filepath.Dir(ex)
+	fmt.Println(exePath)
+
+	mydir, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(mydir)
 	cfg, err = ini.Load("xtrm.ini")
 	if nil != err {
 		xLog.Fatalf("%s\n\t%s\n",
@@ -88,18 +103,22 @@ func InitConfig() {
 			err.Error())
 	}
 
+	// Flags.Profile defaults to the default section
+	// the only value in the default section is currentSection
+	// so unless the profile is overridden, the default profile
+	// is the last profile used.
 	xData["currentSection"] = *Flags.Profile
-	xsec := loadSection(*Flags.Profile)
+	xSec := loadSection(*Flags.Profile)
 	if ini.DefaultSection == *Flags.Profile {
-		loadKey(xsec, "currentSection", true)
-		xsec = loadSection(xData["currentSection"])
+		loadKey(xSec, "currentSection", true)
+		xSec = loadSection(xData["currentSection"])
 	}
 
 	for _, v := range requiredKeys {
-		loadKey(xsec, v, true)
+		loadKey(xSec, v, true)
 	}
 	for _, v := range optionalKeys {
-		loadKey(xsec, v, false)
+		loadKey(xSec, v, false)
 	}
 
 }
