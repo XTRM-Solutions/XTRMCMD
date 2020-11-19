@@ -1,4 +1,4 @@
-module xtrm.com/XTRMCMD
+module xtrmcmd
 
 go 1.1
 

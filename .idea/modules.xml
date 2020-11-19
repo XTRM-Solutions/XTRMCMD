@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/XTRM.iml" filepath="$PROJECT_DIR$/XTRM.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/XTRMCMD.iml" filepath="$PROJECT_DIR$/.idea/XTRMCMD.iml" />
     </modules>
   </component>
 </project>
