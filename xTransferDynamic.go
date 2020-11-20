@@ -6,7 +6,7 @@ import (
 )
 
 // need to stack this stuff to marshall / unmarshall correctly
-// JSON unmarshaller uses the tag information to map structs to fields by reflection
+// JSON un-marshal uses the tag information to map structs to fields by reflection
 type Request struct {
 	IssuerAccountNumber string `json:"IssuerAccountNumber"`
 	FromAccountNumber   string `json:"FromAccountNumber"`
@@ -58,9 +58,9 @@ func xTransferDynamic(reqData TransferFundToDynamicAccountUserStruct) (resp Tran
 		return resp, err
 	}
 	payload := bytes.NewReader(jsonData)
-	xbody, err := XPostRequest(url, payload)
+	xBody, err := XPostRequest(url, payload)
 	if nil != err {
 		return resp, err
 	}
-	return resp, json.Unmarshal(xbody, &resp)
+	return resp, json.Unmarshal(xBody, &resp)
 }

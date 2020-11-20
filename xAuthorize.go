@@ -44,20 +44,20 @@ func isTokenActive(duration time.Duration) (active bool) {
 	return false
 }
 
-func xAuthorize(xmethod, xurl, xclient, xsecret string) (success bool) {
+func xAuthorize(xMethod, xUrl, xClient, xSecret string) (success bool) {
 
-	if isTokenActive((2 * time.Hour)) {
+	if isTokenActive(2 * time.Hour) {
 		return true
 	}
 
 	// otherwise need to authorize
 	// don't see any point in using token refresh
 	payload := strings.NewReader("grant_type=password" +
-		"&client_id=" + xclient +
-		"&client_secret=" + xsecret)
+		"&client_id=" + xClient +
+		"&client_secret=" + xSecret)
 
 	client := &http.Client{}
-	req, err := http.NewRequest(xmethod, xurl, payload)
+	req, err := http.NewRequest(xMethod, xUrl, payload)
 
 	if err != nil {
 		xLog.Fatal(err.Error())
@@ -71,13 +71,13 @@ func xAuthorize(xmethod, xurl, xclient, xsecret string) (success bool) {
 
 	defer DeferError(res.Body.Close)
 
-	xbody, err := ioutil.ReadAll(res.Body)
+	xBody, err := ioutil.ReadAll(res.Body)
 	if nil != err {
 		xLog.Fatal(err.Error())
 	}
 
 	var tr tokenResponse
-	err = json.Unmarshal(xbody, &tr)
+	err = json.Unmarshal(xBody, &tr)
 	if nil != err {
 		xLog.Fatal(err.Error())
 	}

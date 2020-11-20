@@ -1,13 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"github.com/go-ini/ini"
 	flag "github.com/spf13/pflag"
 	"os"
 	"path/filepath"
 )
 
+const INIFILE string = "xtrm.ini"
+
+var iniFileName = INIFILE
 var cfg *ini.File
 
 var requiredKeys = [...]string{
@@ -48,7 +50,7 @@ var Flags struct {
 func InitFlags() {
 
 	// Example command line:
-	// XTRMPAY --payee nathan@xtrm.com --currency USD --amount 4.53  \
+	// XTRMPAY --payee nathan@xtrm.com --currency USD --amount 4.53  ^
 	//      --firstname Jean-Paul --lastname Dough --description "Money Test" --debug true
 
 	Flags.PayeeEmail = flag.StringP("payee", "p", "nathan@xtrm.com", "email address of payee")
@@ -84,23 +86,33 @@ func loadSection(profile string) (section *ini.Section) {
 func InitConfig() {
 	var err error
 
-	ex, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
+	ex, _ := os.Executable()
 	exePath := filepath.Dir(ex)
-	fmt.Println(exePath)
+	myDir, _ := os.Getwd()
 
-	mydir, err := os.Getwd()
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(mydir)
-	cfg, err = ini.Load("xtrm.ini")
+	cfg, err = ini.Load(iniFileName)
 	if nil != err {
-		xLog.Fatalf("%s\n\t%s\n",
-			"Failed to read config file [ xtrm.ini ]  because: ",
-			err.Error())
+		if *Flags.Debug {
+			xLog.Println("attempted to load ", INIFILE)
+		}
+		iniFileName = filepath.Join(myDir, INIFILE)
+		cfg, err = ini.Load(iniFileName)
+
+		if nil != err {
+			if *Flags.Debug {
+				xLog.Println("attempted to load ", iniFileName)
+			}
+			iniFileName = filepath.Join(exePath, INIFILE)
+			cfg, err = ini.Load(iniFileName)
+			if nil != err {
+				if *Flags.Debug {
+					xLog.Println("attempted to load ", iniFileName)
+				}
+				xLog.Fatalf("%s\n\t%s\n",
+					"Failed to read config file [ xtrm.ini ]  because: ",
+					err.Error())
+			}
+		}
 	}
 
 	// Flags.Profile defaults to the default section
@@ -125,7 +137,7 @@ func InitConfig() {
 
 func writeCurrentSectionKeys() {
 	currentSection := xData["currentSection"]
-	xsec, err := cfg.GetSection(currentSection)
+	xSection, err := cfg.GetSection(currentSection)
 
 	if nil != err {
 		xLog.Fatal("internal error: no configuration section [" +
@@ -134,19 +146,19 @@ func writeCurrentSectionKeys() {
 
 	// required keys should not be touched here
 	for _, v := range optionalKeys {
-		saveIniKey(xsec, v, xData[v])
+		saveIniKey(xSection, v, xData[v])
 	}
 
 	// update the currentSection
-	xsec, err = cfg.GetSection(ini.DefaultSection)
+	xSection, err = cfg.GetSection(ini.DefaultSection)
 	if nil != err {
 		xLog.Fatal("internal error: no default section [ " +
 			ini.DefaultSection + " ]")
 	}
-	saveIniKey(xsec, "currentSection", currentSection)
+	saveIniKey(xSection, "currentSection", currentSection)
 
 	// update ini file here
-	err = cfg.SaveTo("xtrm.ini")
+	err = cfg.SaveTo(iniFileName)
 	if nil != err {
 		xLog.Fatal("Internal error: failed to write config file [ xtrm.ini ] because: \n\t" + err.Error())
 	}
@@ -161,11 +173,11 @@ func loadKey(section *ini.Section, key string, required bool) {
 	xData[key] = section.Key(key).String()
 }
 
-func saveIniKey(xsec *ini.Section, key string, val string) {
-	xsec.DeleteKey(key)
+func saveIniKey(xSection *ini.Section, key string, val string) {
+	xSection.DeleteKey(key)
 	val, ok := xData[key]
 	if ok {
-		_, err := xsec.NewKey(key, val)
+		_, err := xSection.NewKey(key, val)
 		if nil != err {
 			xLog.Fatalf("%s%s%s%s%s%s",
 				"Could not set key [ ",
@@ -174,6 +186,7 @@ func saveIniKey(xsec *ini.Section, key string, val string) {
 				val,
 				" ] because:\n\t",
 				err.Error())
+
 		}
 	}
 }
