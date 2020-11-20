@@ -1,4 +1,4 @@
-package xtrmcmd
+package main
 
 import (
 	"encoding/json"
