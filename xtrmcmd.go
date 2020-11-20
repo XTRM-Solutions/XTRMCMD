@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"os"
-	// "github.com/spf13/cobra" // not yet
 )
 
 var xLog *log.Logger
@@ -22,7 +21,6 @@ func InitLog() {
 	if nil != err {
 		fmt.Println("Could not open logging file xtrmcmd.log because " + err.Error())
 	}
-	// xLogWriter = bufio.NewWriter(xLogFile)
 
 	xbf := io.MultiWriter(xLogFile, os.Stderr)
 	xLog = log.New(xbf, "xtrmcmd: ", log.Lshortfile)

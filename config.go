@@ -36,14 +36,14 @@ var xData = map[string]string{
 	"currentSection": ini.DefaultSection,
 }
 
-var nFlags pflag.FlagSet
+var nFlags *pflag.FlagSet
 
 func InitFlags() {
 
 	// Example command line:
 	// XTRMPAY --payee nathan@xtrm.com --currency USD --amount 4.53  ^
 	//      --firstname Jean-Paul --lastname Dough --description "Money Test" --debug true
-	nFlags := pflag.NewFlagSet("default", pflag.ContinueOnError)
+	nFlags = pflag.NewFlagSet("default", pflag.ContinueOnError)
 
 	nFlags.StringP("payee", "p", "nathan@xtrm.com", "email address of payee")
 	nFlags.StringP("currency", "c", "USD", "Currency to pay")
@@ -55,10 +55,16 @@ func InitFlags() {
 	nFlags.String("profile", ini.DefaultSection, "API Access Profile")
 	nFlags.BoolP("help", "h", false, "Print this help message")
 
+	err := nFlags.Parse(os.Args[1:])
+
+	if nil != err {
+		_, _ = fmt.Fprintf(os.Stderr, "\nerror parsing flags: %s\n", err.Error())
+		os.Exit(1)
+	}
+
 	if getFlagBool("help") {
-		nFlags.SetOutput(os.Stdout)
-		fmt.Print("\n")
-		pflag.Usage()
+		_, thisCmd := filepath.Split(os.Args[0])
+		fmt.Print("\n", "usage for ", thisCmd, ":\n", nFlags.FlagUsages(), "\n")
 		msgRequiredIniKeys()
 		os.Exit(0)
 	}
