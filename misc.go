@@ -17,3 +17,25 @@ func DeferError(f func() error) {
 			err.Error())
 	}
 }
+
+func getFlagBool(val string) bool {
+	rc, err := nFlags.GetBool(val)
+	if nil != err {
+		if nil != xLog {
+			xLog.Printf("error fetching value for boolean flag [ %s ]\n", val)
+		}
+		return false
+	}
+	return rc
+}
+
+func getFlagString(val string) string {
+	rc, err := nFlags.GetString(val)
+	if nil != err {
+		if nil != xLog {
+			xLog.Printf("error fetching value for string flag [ %s ]\n", val)
+		}
+		return ""
+	}
+	return rc
+}

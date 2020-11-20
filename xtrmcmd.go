@@ -41,7 +41,7 @@ func main() {
 		xData["xClient"],
 		xData["xSecret"])
 
-	if *Flags.Debug {
+	if getFlagBool("debug") {
 		xLog.Print("Received access token: " +
 			xData["TokenType"] + " " +
 			xData["AccessToken"])
@@ -53,12 +53,12 @@ func main() {
 	sm.IssuerAccountNumber = xData["xIssuerID"]
 	sm.FromAccountNumber = xData["xIssuerID"]
 	sm.FromWalletID = xData["xDefaultWallet"]
-	sm.Amount = *Flags.Amount
-	sm.Currency = *Flags.Currency
-	sm.RecipientFirstName = *Flags.FirstName
-	sm.RecipientLastName = *Flags.LastName
-	sm.Description = *Flags.Description
-	sm.RecipientEmail = *Flags.PayeeEmail
+	sm.Amount = getFlagString("amount")
+	sm.Currency = getFlagString("currency")
+	sm.RecipientFirstName = getFlagString("firstname")
+	sm.RecipientLastName = getFlagString("lastname")
+	sm.Description = getFlagString("description")
+	sm.RecipientEmail = getFlagString("payee")
 
 	tResp, err := xTransferDynamic(sendMoney)
 
@@ -67,7 +67,7 @@ func main() {
 
 	}
 
-	if *Flags.Debug {
+	if getFlagBool("debug") {
 		var s string
 
 		jsonData, err := json.MarshalIndent(tResp, "", "    ")

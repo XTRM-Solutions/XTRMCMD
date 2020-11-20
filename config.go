@@ -1,8 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"github.com/go-ini/ini"
-	flag "github.com/spf13/pflag"
+	pflag "github.com/spf13/pflag"
 	"os"
 	"path/filepath"
 )
@@ -35,38 +36,29 @@ var xData = map[string]string{
 	"currentSection": ini.DefaultSection,
 }
 
-var Flags struct {
-	PayeeEmail  *string
-	Currency    *string
-	Amount      *string
-	FirstName   *string
-	LastName    *string
-	Description *string
-	Debug       *bool
-	Profile     *string
-	Help        *bool
-}
+var nFlags pflag.FlagSet
 
 func InitFlags() {
 
 	// Example command line:
 	// XTRMPAY --payee nathan@xtrm.com --currency USD --amount 4.53  ^
 	//      --firstname Jean-Paul --lastname Dough --description "Money Test" --debug true
+	nFlags := pflag.NewFlagSet("default", pflag.ContinueOnError)
 
-	Flags.PayeeEmail = flag.StringP("payee", "p", "nathan@xtrm.com", "email address of payee")
-	Flags.Currency = flag.StringP("currency", "c", "USD", "Currency to pay")
-	Flags.Amount = flag.StringP("amount", "a", "4.53", "Amount to pay")
-	Flags.FirstName = flag.StringP("firstname", "f", "Jean-Paul", "Payee first name")
-	Flags.LastName = flag.StringP("lastname", "l", "Dough", "Payee first name")
-	Flags.Description = flag.StringP("description", "d", "Money Test to Friend", "Description of Money Transfer")
-	Flags.Debug = flag.Bool("debug", false, "enable debug output")
-	Flags.Profile = flag.String("profile", ini.DefaultSection, "API Access Profile")
-	Flags.Help = flag.BoolP("help", "h", false, "Print this help message")
+	nFlags.StringP("payee", "p", "nathan@xtrm.com", "email address of payee")
+	nFlags.StringP("currency", "c", "USD", "Currency to pay")
+	nFlags.StringP("amount", "a", "4.53", "Amount to pay")
+	nFlags.StringP("firstname", "f", "John", "Payee first name")
+	nFlags.StringP("lastname", "l", "Doe", "Payee first name")
+	nFlags.StringP("description", "d", "Money Test to Friend", "XTRMCMD payment method")
+	nFlags.Bool("debug", false, "enable debug output")
+	nFlags.String("profile", ini.DefaultSection, "API Access Profile")
+	nFlags.BoolP("help", "h", false, "Print this help message")
 
-	flag.Parse()
-
-	if *Flags.Help {
-		flag.Usage()
+	if getFlagBool("help") {
+		nFlags.SetOutput(os.Stdout)
+		fmt.Print("\n")
+		pflag.Usage()
 		msgRequiredIniKeys()
 		os.Exit(0)
 	}
@@ -92,20 +84,20 @@ func InitConfig() {
 
 	cfg, err = ini.Load(iniFileName)
 	if nil != err {
-		if *Flags.Debug {
+		if getFlagBool("debug") {
 			xLog.Println("attempted to load ", INIFILE)
 		}
 		iniFileName = filepath.Join(myDir, INIFILE)
 		cfg, err = ini.Load(iniFileName)
 
 		if nil != err {
-			if *Flags.Debug {
+			if getFlagBool("debug") {
 				xLog.Println("attempted to load ", iniFileName)
 			}
 			iniFileName = filepath.Join(exePath, INIFILE)
 			cfg, err = ini.Load(iniFileName)
 			if nil != err {
-				if *Flags.Debug {
+				if getFlagBool("debug") {
 					xLog.Println("attempted to load ", iniFileName)
 				}
 				xLog.Printf("%s\n\t%s\n",
@@ -115,7 +107,7 @@ func InitConfig() {
 		}
 	}
 
-	if *Flags.Debug {
+	if getFlagBool("debug") {
 		xLog.Printf("\n\tLoading inifile from %s\n\n", iniFileName)
 	}
 
@@ -123,9 +115,9 @@ func InitConfig() {
 	// the only value in the default section is currentSection
 	// so unless the profile is overridden, the default profile
 	// is the last profile used.
-	xData["currentSection"] = *Flags.Profile
-	xSec := loadSection(*Flags.Profile)
-	if ini.DefaultSection == *Flags.Profile {
+	xData["currentSection"] = getFlagString("profile")
+	xSec := loadSection(xData["currentSection"])
+	if ini.DefaultSection == xData["currentSection"] {
 		loadKey(xSec, "currentSection", true)
 		xSec = loadSection(xData["currentSection"])
 	}
@@ -196,7 +188,7 @@ func saveIniKey(xSection *ini.Section, key string, val string) {
 }
 
 func msgRequiredIniKeys() {
-	xLog.Printf("\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n",
+	msg := fmt.Sprintf("\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n",
 		"This program REQUIRES some initialization keys in the file XTRM.INI\n",
 		"an initial file looks something like: (minimal required file)\n\n",
 		"\t[DEFAULT]\n",
@@ -211,4 +203,10 @@ func msgRequiredIniKeys() {
 		"\nPlease ensure this file exists with the minimum required keys in the XTRM command directory\n",
 		"Please substitute in the correct values from the API integration page in the console application\n",
 		"Please note all keys and values are CASE SENSITIVE as token, secret, and URLs may be case sensitive")
+
+	if getFlagBool("help") {
+		_, _ = fmt.Print(msg)
+	} else {
+		xLog.Print(msg)
+	}
 }
