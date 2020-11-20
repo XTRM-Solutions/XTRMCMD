@@ -59,7 +59,7 @@ func InitFlags() {
 	Flags.FirstName = flag.StringP("firstname", "f", "Jean-Paul", "Payee first name")
 	Flags.LastName = flag.StringP("lastname", "l", "Dough", "Payee first name")
 	Flags.Description = flag.StringP("description", "d", "Money Test to Friend", "Description of Money Transfer")
-	Flags.Debug = flag.Bool("debug", true, "enable debug output")
+	Flags.Debug = flag.Bool("debug", false, "enable debug output")
 	Flags.Profile = flag.String("profile", ini.DefaultSection, "API Access Profile")
 	Flags.Help = flag.BoolP("help", "h", false, "Print this help message")
 
@@ -108,11 +108,15 @@ func InitConfig() {
 				if *Flags.Debug {
 					xLog.Println("attempted to load ", iniFileName)
 				}
-				xLog.Fatalf("%s\n\t%s\n",
+				xLog.Printf("%s\n\t%s\n",
 					"Failed to read config file [ xtrm.ini ]  because: ",
 					err.Error())
 			}
 		}
+	}
+
+	if *Flags.Debug {
+		xLog.Printf("\n\tLoading inifile from %s\n\n", iniFileName)
 	}
 
 	// Flags.Profile defaults to the default section

@@ -1,4 +1,4 @@
-module main
+module xtrmcmd
 
 go 1.5
 
