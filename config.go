@@ -52,6 +52,7 @@ func InitFlags() {
 	nFlags.StringP("lastname", "l", "Doe", "Payee first name")
 	nFlags.StringP("description", "d", "Money Test to Friend", "XTRMCMD payment method")
 	nFlags.Bool("debug", false, "enable debug output")
+	nFlags.BoolP("quiet", "q", false, "suppress non-error output")
 	nFlags.String("profile", ini.DefaultSection, "API Access Profile")
 	nFlags.BoolP("help", "h", false, "Print this help message")
 
