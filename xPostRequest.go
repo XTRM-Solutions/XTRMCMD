@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -15,7 +14,7 @@ func XPostRequest(url string, payload io.Reader) (resp []byte, err error) {
 	}
 	s := xData["TokenType"] + " " + xData["AccessToken"]
 	if getFlagBool("debug") {
-		fmt.Println(s)
+		xLog.Println(s)
 	}
 	req.Header.Add("Authorization", s)
 	req.Header.Add("Content-Type", "application/json")
@@ -26,7 +25,7 @@ func XPostRequest(url string, payload io.Reader) (resp []byte, err error) {
 		resp, err = ioutil.ReadAll(res.Body)
 	}
 	if getFlagBool("debug") {
-		fmt.Println(string(resp))
+		xLog.Println(string(resp))
 	}
 	return resp, err
 }
