@@ -49,6 +49,14 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
+	// this is just to lessen the amount of typing to access the object fields
+	transferResult := &tResp.TransferFundToDynamicAccountUserResponse.TransferFundToDynamicAccountUserResult
+
+	if !transferResult.OperationStatus.Success {
+		xLog.Fatal("TransferFundToDynamicAccountUser failed because:" +
+			transferResult.OperationStatus.Errors)
+	}
+
 	if getFlagBool("debug") {
 		jsonData, err := json.MarshalIndent(tResp, "", "    ")
 		if nil != err {
@@ -58,8 +66,8 @@ func main() {
 	}
 
 	if !getFlagBool("quiet") {
-		transferResult := &tResp.TransferFundToDynamicAccountUserResponse.TransferFundToDynamicAccountUserResult
-		fmt.Printf("\nSuccess! TransactionID %s for %s (%s transferred, %s fee) %s to recipient %s (%s %s %s )\n",
+
+		fmt.Printf("\nSuccess! TransactionID %s for %s (%s transferred, %s fee) %s to recipient %s (%s %s %s)\n",
 			transferResult.TransactionID, transferResult.TotalAmount, transferResult.Amount,
 			transferResult.Fee, transferResult.Currency, transferResult.RecipientAccountNumber,
 			sm.RecipientFirstName, sm.RecipientLastName,

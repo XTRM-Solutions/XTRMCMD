@@ -27,10 +27,13 @@ type TransferFundToDynamicAccountUserStruct struct {
 	TransferFundToDynamicAccountUser TransferFundToDynamicAccountUser `json:"TransferFundToDynamicAccountUser"`
 }
 
+/***********************************
+// this construct is used in most responses, so is declared globally in misc.go
 type OperationStatus struct {
-	Success bool        `json:"Success"`
-	Errors  interface{} `json:"Errors"`
+	Success bool    `json:"Success"`
+	Errors  string  `json:"Errors"`
 } // `json:"OperationStatus"`
+*/
 
 type TransferFundToDynamicAccountUserResult struct {
 	TransactionID          string          `json:"TransactionID"`

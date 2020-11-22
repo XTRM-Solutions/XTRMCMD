@@ -5,6 +5,12 @@ import (
 	"os"
 )
 
+// all of the XTRM api requests use this status structure
+type OperationStatus struct {
+	Success bool   `json:"Success"`
+	Errors  string `json:"Errors"`
+} // `json:"OperationStatus"`
+
 // for those functions that should be deferred,
 // yet return errors, this handles & reports the error
 // cannot assume Log is {yet, still} active, so do not log
