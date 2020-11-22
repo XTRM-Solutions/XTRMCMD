@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+
 	InitLog()
 	defer DeferError(xLogFile.Close)
 
@@ -64,4 +65,5 @@ func main() {
 			sm.RecipientFirstName, sm.RecipientLastName,
 			sm.RecipientEmail)
 	}
+
 }

@@ -14,7 +14,9 @@ func XPostRequest(url string, payload io.Reader) (resp []byte, err error) {
 		return resp, err
 	}
 	s := xData["TokenType"] + " " + xData["AccessToken"]
-	fmt.Println(s)
+	if getFlagBool("debug") {
+		fmt.Println(s)
+	}
 	req.Header.Add("Authorization", s)
 	req.Header.Add("Content-Type", "application/json")
 
@@ -23,6 +25,8 @@ func XPostRequest(url string, payload io.Reader) (resp []byte, err error) {
 		defer DeferError(res.Body.Close)
 		resp, err = ioutil.ReadAll(res.Body)
 	}
-	fmt.Println(string(resp))
+	if getFlagBool("debug") {
+		fmt.Println(string(resp))
+	}
 	return resp, err
 }
