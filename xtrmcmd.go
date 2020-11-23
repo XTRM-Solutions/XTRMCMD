@@ -19,10 +19,12 @@ func main() {
 
 	InitConfig()
 
-	xAuthorize("POST",
+	xAuthorize(
+		"POST",
 		xData["apiAuthorizeUrl"],
 		xData["xClient"],
-		xData["xSecret"])
+		xData["xSecret"],
+	)
 
 	if getFlagBool("debug") {
 		xLog.Print("Received access token: " +
@@ -46,19 +48,18 @@ func main() {
 	tResp, err := xTransferDynamic(sendMoney)
 
 	if nil != err {
-		log.Fatal(err.Error())
+		log.Fatal("TransferFundToDynamicAccountUser failed because: " + err.Error())
 	}
 
-	// this is just to lessen the amount of typing to access the object fields
-	transferResult := &tResp.TransferFundToDynamicAccountUserResponse.TransferFundToDynamicAccountUserResult
+	tr := &tResp.TransferFundToDynamicAccountUserResponse.TransferFundToDynamicAccountUserResult
 
-	if !transferResult.OperationStatus.Success {
-		xLog.Fatal("TransferFundToDynamicAccountUser failed because:" +
-			transferResult.OperationStatus.Errors)
+	if !tr.OperationStatus.Success {
+		xLog.Println("TransferFundToDynamicAccountUser failed because:" +
+			tr.OperationStatus.Errors)
 	}
 
 	if getFlagBool("debug") {
-		jsonData, err := json.MarshalIndent(tResp, "", "    ")
+		jsonData, err := json.MarshalIndent(tResp, "", "  ")
 		if nil != err {
 			log.Fatalf("could not unmarshal JSON response because %s\n", err.Error())
 		}
@@ -66,12 +67,10 @@ func main() {
 	}
 
 	if !getFlagBool("quiet") {
-
 		fmt.Printf("\nSuccess! TransactionID %s for %s (%s transferred, %s fee) %s to recipient %s (%s %s %s)\n",
-			transferResult.TransactionID, transferResult.TotalAmount, transferResult.Amount,
-			transferResult.Fee, transferResult.Currency, transferResult.RecipientAccountNumber,
-			sm.RecipientFirstName, sm.RecipientLastName,
-			sm.RecipientEmail)
+			tr.TransactionID, tr.TotalAmount, tr.Amount,
+			tr.Fee, tr.Currency, tr.RecipientAccountNumber,
+			sm.RecipientFirstName, sm.RecipientLastName, sm.RecipientEmail)
 	}
 
 }
