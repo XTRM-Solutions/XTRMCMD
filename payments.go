@@ -4,20 +4,28 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 )
 
-func mockPayments() {
-	rand.Seed(time.Now().UTC().UnixNano())
+func shortPause() {
+	v := time.Duration(5*1000*1000) + time.Duration(rand.Int63n(7*1000*1000*100))
+	time.Sleep(v)
+}
 
-	for _, firstName := range patronNames {
-		lastName := patronNames[firstName]
+func mockPayments() {
+
+	rand.Seed(time.Now().UTC().UnixNano())
+	fmt.Println("")
+	for firstName, lastName := range patronNames {
 		amount, fee, total := newDetails()
-		fmt.Printf("\nSuccess! TransactionID %s for %s (%s transferred, %s fee) %s to recipient %s (%s %s %s.%s@mythosseed.com)\n",
+		shortPause()
+		fmt.Printf("Success! TransactionID %s for %s (%s transferred, %s fee) %s to recipient %s (%s %s %s)\n",
 			newTransactionString(),
 			total, amount, fee, "USD",
 			getPat(),
-			firstName, lastName, firstName, lastName)
+			firstName, lastName,
+			strings.ToLower(firstName+"."+lastName+"@mythosseed.com"))
 
 	}
 }
@@ -31,7 +39,7 @@ func getBool(k int32) (b bool) {
 
 func getPat() string {
 	var ix int32
-	for ix = rand.Int31n(5555) + rand.Int31n(55) + 678; getBool(ix); {
+	for ix = rand.Int31n(18555) + rand.Int31n(55) + 678; getBool(ix); {
 		// collision? Try again!
 		ix = rand.Int31n(5555) + rand.Int31n(55) + 678
 	}
@@ -43,7 +51,7 @@ func getPat() string {
 var tx int64 = 11921
 
 func newTransactionString() (rx string) {
-	tx += rand.Int63n(5) + 1
+	tx += rand.Int63n(5) + rand.Int63n(5) + rand.Int63n(5) + 1
 	return strconv.FormatInt(tx, 10)
 }
 
@@ -51,11 +59,11 @@ func newDetails() (amount string, fee string, total string) {
 
 	num := rand.Int31n(51) + 11
 	dec := rand.Int31n(100)
-	amount = strconv.Itoa(int(num)) + "." + strconv.Itoa(int(dec))
+	amount = fmt.Sprintf("%d.%02d", int(num), int(dec))
 	v, _ := strconv.ParseFloat(amount, 64)
-	w := v*.01 + 1.00 // fee
-	fee = fmt.Sprintf("%.2f", w)
-	total = fmt.Sprintf("%.2f", v+w)
+	w := v*.0125 + 0.97 // fee
+	fee = fmt.Sprintf("%.02f", w)
+	total = fmt.Sprintf("%.02f", v+w)
 
 	return amount, fee, total
 }
