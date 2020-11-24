@@ -55,6 +55,7 @@ func InitFlags() {
 	nFlags.BoolP("quiet", "q", false, "suppress non-error output")
 	nFlags.String("profile", ini.DefaultSection, "API Access Profile")
 	nFlags.BoolP("help", "h", false, "Print this help message")
+	nFlags.String("payfile", "", "CSV payment file (email, firstname, lastname, amount, currency")
 
 	err := nFlags.Parse(os.Args[1:])
 
@@ -69,6 +70,7 @@ func InitFlags() {
 		msgRequiredIniKeys()
 		os.Exit(0)
 	}
+
 }
 
 func loadSection(profile string) (section *ini.Section) {

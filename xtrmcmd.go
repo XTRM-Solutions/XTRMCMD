@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 )
 
 func main() {
@@ -19,6 +20,11 @@ func main() {
 
 	InitConfig()
 
+	if "" != getFlagString("payfile") {
+		mockPayments()
+		os.Exit(0)
+	}
+
 	xAuthorize(
 		"POST",
 		xData["apiAuthorizeUrl"],
@@ -30,7 +36,6 @@ func main() {
 		xLog.Print("Received access token: " +
 			xData["TokenType"] + " " +
 			xData["AccessToken"])
-
 	}
 
 	var sendMoney TransferFundToDynamicAccountUserStruct
