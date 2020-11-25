@@ -9,7 +9,9 @@ import (
 )
 
 func shortPause() {
-	v := time.Duration(5*1000*1000) + time.Duration(rand.Int63n(7*1000*1000*100))
+	v := time.Duration(5*1000*1000) + time.Duration(rand.Int63n(2*1000*1000*100)) +
+		time.Duration(rand.Int63n(2*1000*1000*100)) +
+		time.Duration(rand.Int63n(2*1000*1000*100))
 	time.Sleep(v)
 }
 
@@ -30,21 +32,21 @@ func mockPayments() {
 	}
 }
 
-var patronList = map[int32]bool{0: true}
+var patronList = map[int64]bool{0: true}
 
-func getBool(k int32) (b bool) {
+func getBool(k int64) (b bool) {
 	_, b = patronList[k]
 	return b
 }
 
 func getPat() string {
-	var ix int32
-	for ix = rand.Int31n(18555) + rand.Int31n(55) + 678; getBool(ix); {
+	var ix int64
+	for ix = rand.Int63n(19999999) + rand.Int63n(99999) + 678; getBool(ix); {
 		// collision? Try again!
-		ix = rand.Int31n(5555) + rand.Int31n(55) + 678
+		ix = rand.Int63n(5555) + rand.Int63n(55) + 678
 	}
 	patronList[ix] = true
-	return "PAT" + strconv.FormatInt(int64(ix), 10)
+	return "PAT" + strconv.FormatInt(ix, 10)
 
 }
 
