@@ -28,7 +28,7 @@ func mockPayments() {
 	for firstName, lastName := range patronNames {
 		amount, fee, total := newDetails()
 		shortPause()
-		fmt.Printf("Success! TransactionID %s for %s (%s transferred, %s fee) %s to recipient %s (%s %s %s)\n",
+		fmt.Printf("Success! TransactionID %9s for %s (%s transferred, %s fee) %s to recipient %s (%s %s %s)\n",
 			newTransactionString(),
 			total, amount, fee, "USD",
 			getPat(),
@@ -71,8 +71,8 @@ func newDetails() (amount string, fee string, total string) {
 	amount = fmt.Sprintf("%d.%02d", int(num), int(dec))
 	v, _ := strconv.ParseFloat(amount, 64)
 	w := v*.0125 + 0.97 // fee
-	fee = fmt.Sprintf("%.02f", w)
-	total = fmt.Sprintf("%.02f", v+w)
+	fee = fmt.Sprintf("%8.02f", w)
+	total = fmt.Sprintf("%9.02f", v+w)
 
 	return amount, fee, total
 }
