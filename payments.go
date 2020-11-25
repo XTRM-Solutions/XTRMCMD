@@ -9,9 +9,15 @@ import (
 )
 
 func shortPause() {
-	v := time.Duration(5*1000*1000) + time.Duration(rand.Int63n(2*1000*1000*100)) +
+	// generate a bell curve sleep() rather than linear
+	v := time.Duration(5*1000*1000) +
 		time.Duration(rand.Int63n(2*1000*1000*100)) +
-		time.Duration(rand.Int63n(2*1000*1000*100))
+		time.Duration(rand.Int63n(1000*1000*100)) +
+		time.Duration(rand.Int63n(1000*1000*100)) +
+		time.Duration(rand.Int63n(1000*1000*100)) +
+		time.Duration(rand.Int63n(1000*1000*100)) +
+		time.Duration(rand.Int63n(1000*1000*100)) +
+		time.Duration(rand.Int63n(1000*1000*100))
 	time.Sleep(v)
 }
 
@@ -46,14 +52,15 @@ func getPat() string {
 		ix = rand.Int63n(5555) + rand.Int63n(55) + 678
 	}
 	patronList[ix] = true
-	return "PAT" + strconv.FormatInt(ix, 10)
+	//return "PAT" + strconv.FormatInt(ix, 10)
+	return fmt.Sprintf("PAT%-9d", ix)
 
 }
 
 var tx int64 = 11921
 
 func newTransactionString() (rx string) {
-	tx += rand.Int63n(5) + rand.Int63n(5) + rand.Int63n(5) + 1
+	tx += rand.Int63n(5) + rand.Int63n(5) + rand.Int63n(5) + rand.Int63n(5) + rand.Int63n(5) + 1
 	return strconv.FormatInt(tx, 10)
 }
 
