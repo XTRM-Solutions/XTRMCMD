@@ -10,8 +10,11 @@ import (
 
 func shortPause() {
 	// generate a bell curve sleep() rather than linear
-	v := time.Duration(5*1000*1000) +
+	v := time.Duration(1*1000*1000) +
 		time.Duration(rand.Int63n(2*1000*1000*100)) +
+		time.Duration(rand.Int63n(1000*1000*100)) +
+		time.Duration(rand.Int63n(1000*1000*100)) +
+		time.Duration(rand.Int63n(1000*1000*100)) +
 		time.Duration(rand.Int63n(1000*1000*100)) +
 		time.Duration(rand.Int63n(1000*1000*100)) +
 		time.Duration(rand.Int63n(1000*1000*100)) +
@@ -25,11 +28,11 @@ func mockPayments() {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 	fmt.Println("")
-	for firstName, lastName := range patronNames {
-		amount, fee, total := newDetails()
+	for firstName, lastName := range mockPatronNames {
+		amount, fee, total := NewMockTransactionDetails()
 		shortPause()
 		fmt.Printf("Success! TransactionID %9s for %s (%s transferred, %s fee) %s to recipient %s (%s %s %s)\n",
-			newTransactionString(),
+			newMockTransactionNumberString(),
 			total, amount, fee, "USD",
 			getPat(),
 			firstName, lastName,
@@ -52,32 +55,32 @@ func getPat() string {
 		ix = rand.Int63n(5555) + rand.Int63n(55) + 678
 	}
 	patronList[ix] = true
-	//return "PAT" + strconv.FormatInt(ix, 10)
+	// return "PAT" + strconv.FormatInt(ix, 10)
 	return fmt.Sprintf("PAT%-9d", ix)
 
 }
 
 var tx int64 = 11921
 
-func newTransactionString() (rx string) {
-	tx += rand.Int63n(5) + rand.Int63n(5) + rand.Int63n(5) + rand.Int63n(5) + rand.Int63n(5) + 1
+func newMockTransactionNumberString() (rx string) {
+	tx += rand.Int63n(25) + 1
 	return strconv.FormatInt(tx, 10)
 }
 
-func newDetails() (amount string, fee string, total string) {
+func NewMockTransactionDetails() (amount string, fee string, total string) {
 
 	num := rand.Int31n(51) + 11
 	dec := rand.Int31n(100)
 	amount = fmt.Sprintf("%d.%02d", int(num), int(dec))
 	v, _ := strconv.ParseFloat(amount, 64)
-	w := v*.0125 + 0.97 // fee
+	w := v*.0125 + 0.25 // fee
 	fee = fmt.Sprintf("%8.02f", w)
 	total = fmt.Sprintf("%9.02f", v+w)
 
 	return amount, fee, total
 }
 
-var patronNames = map[string]string{
+var mockPatronNames = map[string]string{
 	"Jessie":     "Orr",
 	"Juliet":     "Vega",
 	"Casey":      "Copeland",
