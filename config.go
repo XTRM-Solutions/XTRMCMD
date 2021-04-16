@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/go-ini/ini"
-	pflag "github.com/spf13/pflag"
 	"os"
 	"path/filepath"
+
+	"github.com/go-ini/ini"
+	"github.com/spf13/pflag"
 )
 
 const INIFILE string = "xtrm.ini"
@@ -69,6 +70,10 @@ func InitFlags() {
 		fmt.Print("\n", "usage for ", thisCmd, ":\n", nFlags.FlagUsages(), "\n")
 		msgRequiredIniKeys()
 		os.Exit(0)
+	}
+
+	if GetFlagBool("quiet") {
+		SetQuietLog()
 	}
 
 }

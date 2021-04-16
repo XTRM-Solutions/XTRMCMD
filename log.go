@@ -17,7 +17,7 @@ func InitLog() {
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
 		644)
 	if nil != err {
-		fmt.Println("Could not open logging file xtrmcmd.log because " + err.Error())
+		fmt.Fprintln(os.Stderr, "Could not open logging file xtrmcmd.log because "+err.Error())
 	}
 
 	xbf := io.MultiWriter(xLogFile, os.Stderr)
@@ -25,6 +25,6 @@ func InitLog() {
 
 }
 
-func setQuietLog() {
+func SetQuietLog() {
 	xLog.SetOutput(xLogFile)
 }

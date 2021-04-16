@@ -23,10 +23,6 @@ func main() {
 
 	InitFlags()
 
-	if GetFlagBool("quiet") {
-		setQuietLog()
-	}
-
 	InitConfig()
 
 	if "" != GetFlagString("payfile") {

@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 )
 
+// Request
 // need to stack this stuff to marshall / unmarshall correctly
 // JSON un-marshal uses the tag information to map structs to fields by reflection
 type Request struct {
@@ -60,7 +62,7 @@ func xTransferDynamic(reqData TransferFundToDynamicAccountUserStruct) (resp Tran
 	if nil != err {
 		return resp, err
 	}
-	payload := bytes.NewReader(jsonData)
+	payload := bufio.NewReader(bytes.NewReader(jsonData))
 	xBody, err := XPostRequest(url, payload)
 	if nil != err {
 		return resp, err
