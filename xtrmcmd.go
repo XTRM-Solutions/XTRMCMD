@@ -3,25 +3,34 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	homedir "github.com/mitchellh/go-homedir"
 	"log"
 	"os"
 )
 
 func main() {
 
+	s, err := homedir.Dir()
+	if nil != err {
+		fmt.Fprintf(os.Stdout, "error locating homedir: %s \n", err.Error())
+	} else {
+		fmt.Fprintf(os.Stdout, "found homedir: %s\n", s)
+		os.Exit(0)
+	}
+
 	InitLog()
 	defer DeferError(xLogFile.Close)
 
 	InitFlags()
 
-	if getFlagBool("quiet") {
+	if GetFlagBool("quiet") {
 		setQuietLog()
 	}
 
 	InitConfig()
 
-	if "" != getFlagString("payfile") {
-		mockPayments()
+	if "" != GetFlagString("payfile") {
+		MockPayments()
 		os.Exit(0)
 	}
 
@@ -32,7 +41,7 @@ func main() {
 		xData["xSecret"],
 	)
 
-	if getFlagBool("debug") {
+	if GetFlagBool("debug") {
 		xLog.Print("Received access token: " +
 			xData["TokenType"] + " " +
 			xData["AccessToken"])
@@ -43,12 +52,12 @@ func main() {
 	sm.IssuerAccountNumber = xData["xIssuerID"]
 	sm.FromAccountNumber = xData["xIssuerID"]
 	sm.FromWalletID = xData["xDefaultWallet"]
-	sm.Amount = getFlagString("amount")
-	sm.Currency = getFlagString("currency")
-	sm.RecipientFirstName = getFlagString("firstname")
-	sm.RecipientLastName = getFlagString("lastname")
-	sm.Description = getFlagString("description")
-	sm.RecipientEmail = getFlagString("payee")
+	sm.Amount = GetFlagString("amount")
+	sm.Currency = GetFlagString("currency")
+	sm.RecipientFirstName = GetFlagString("firstname")
+	sm.RecipientLastName = GetFlagString("lastname")
+	sm.Description = GetFlagString("description")
+	sm.RecipientEmail = GetFlagString("payee")
 
 	tResp, err := xTransferDynamic(sendMoney)
 
@@ -63,7 +72,7 @@ func main() {
 			tr.OperationStatus.Errors)
 	}
 
-	if getFlagBool("debug") {
+	if GetFlagBool("debug") {
 		jsonData, err := json.MarshalIndent(tResp, "", "  ")
 		if nil != err {
 			log.Fatalf("could not unmarshal JSON response because %s\n", err.Error())
@@ -71,7 +80,7 @@ func main() {
 		log.Printf("jsondata response: \n%s\n", string(jsonData))
 	}
 
-	if !getFlagBool("quiet") {
+	if !GetFlagBool("quiet") {
 		fmt.Printf("\nSuccess! TransactionID %s for %s (%s transferred, %s fee) %s to recipient %s (%s %s %s)\n",
 			tr.TransactionID, tr.TotalAmount, tr.Amount,
 			tr.Fee, tr.Currency, tr.RecipientAccountNumber,

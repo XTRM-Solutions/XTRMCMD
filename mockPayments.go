@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func shortPause() {
+func MockShortPause() {
 	// generate a bell curve sleep() rather than linear
 	v := time.Duration(1*1000*1000) +
 		time.Duration(rand.Int63n(2*1000*1000*100)) +
@@ -24,33 +24,34 @@ func shortPause() {
 	time.Sleep(v)
 }
 
-func mockPayments() {
+func MockPayments() {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 	fmt.Println("")
 	for firstName, lastName := range mockPatronNames {
 		amount, fee, total := NewMockTransactionDetails()
-		shortPause()
-		fmt.Printf("Success! TransactionID %9s for %s (%s transferred, %s fee) %s to recipient %s (%s %s %s)\n",
-			newMockTransactionNumberString(),
+		MockShortPause()
+		fmt.Printf(
+			"Success! TransactionID %9s for %s (%s transferred, %s fee) %s to recipient %s (%s %s %s)\n",
+			NewMockTransactionID(),
 			total, amount, fee, "USD",
-			getPat(),
+			NewMockPatronNumber(),
 			firstName, lastName,
-			strings.ToLower(firstName+"."+lastName+"@mythosseed.com"))
+			strings.ToLower(firstName+"."+lastName+"@grannyraesfeedandseed.com"))
 
 	}
 }
 
 var patronList = map[int64]bool{0: true}
 
-func getBool(k int64) (b bool) {
-	_, b = patronList[k]
-	return b
+func MockPatronAlreadyExists(k int64) (exists bool) {
+	_, exists = patronList[k]
+	return exists
 }
 
-func getPat() string {
+func NewMockPatronNumber() string {
 	var ix int64
-	for ix = rand.Int63n(19999999) + rand.Int63n(99999) + 678; getBool(ix); {
+	for ix = rand.Int63n(19999999) + rand.Int63n(99999) + 678; MockPatronAlreadyExists(ix); {
 		// collision? Try again!
 		ix = rand.Int63n(5555) + rand.Int63n(55) + 678
 	}
@@ -62,7 +63,7 @@ func getPat() string {
 
 var tx int64 = 11921
 
-func newMockTransactionNumberString() (rx string) {
+func NewMockTransactionID() (rx string) {
 	tx += rand.Int63n(25) + 1
 	return strconv.FormatInt(tx, 10)
 }
@@ -74,8 +75,8 @@ func NewMockTransactionDetails() (amount string, fee string, total string) {
 	amount = fmt.Sprintf("%d.%02d", int(num), int(dec))
 	v, _ := strconv.ParseFloat(amount, 64)
 	w := v*.0125 + 0.25 // fee
-	fee = fmt.Sprintf("%8.02f", w)
-	total = fmt.Sprintf("%9.02f", v+w)
+	fee = fmt.Sprintf("%3.02f", w)
+	total = fmt.Sprintf("%4.02f", v+w)
 
 	return amount, fee, total
 }
@@ -181,4 +182,12 @@ var mockPatronNames = map[string]string{
 	"Karter":     "Doyle",
 	"Ayana":      "Caldwell",
 	"Jovanni":    "Boyle",
+	"Siegfried":  "Odinsson",
+	"Sauron":     "Morkothsdotter",
+	"Shelob":     "Ungoliantspawn",
+	"Ancalagon":  "Theblack",
+	"Gandalf":    "Thegray",
+	"Rudolph":    "Thered",
+	"Nader":      "Thegreen",
+	"Oscar":      "Thegold",
 }

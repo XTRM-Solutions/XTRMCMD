@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -46,7 +46,7 @@ func isTokenActive(duration time.Duration) (active bool) {
 
 func xAuthorize(xMethod, xUrl, xClient, xSecret string) (success bool) {
 
-	if isTokenActive(2 * time.Hour) {
+	if isTokenActive(1 * time.Hour) {
 		return true
 	}
 
@@ -71,7 +71,7 @@ func xAuthorize(xMethod, xUrl, xClient, xSecret string) (success bool) {
 
 	defer DeferError(res.Body.Close)
 
-	xBody, err := ioutil.ReadAll(res.Body)
+	xBody, err := io.ReadAll(res.Body)
 	if nil != err {
 		xLog.Fatal(err.Error())
 	}

@@ -64,7 +64,7 @@ func InitFlags() {
 		os.Exit(1)
 	}
 
-	if getFlagBool("help") {
+	if GetFlagBool("help") {
 		_, thisCmd := filepath.Split(os.Args[0])
 		fmt.Print("\n", "usage for ", thisCmd, ":\n", nFlags.FlagUsages(), "\n")
 		msgRequiredIniKeys()
@@ -93,20 +93,20 @@ func InitConfig() {
 
 	cfg, err = ini.Load(iniFileName)
 	if nil != err {
-		if getFlagBool("debug") {
+		if GetFlagBool("debug") {
 			xLog.Println("attempted to load ", INIFILE)
 		}
 		iniFileName = filepath.Join(myDir, INIFILE)
 		cfg, err = ini.Load(iniFileName)
 
 		if nil != err {
-			if getFlagBool("debug") {
+			if GetFlagBool("debug") {
 				xLog.Println("attempted to load ", iniFileName)
 			}
 			iniFileName = filepath.Join(exePath, INIFILE)
 			cfg, err = ini.Load(iniFileName)
 			if nil != err {
-				if getFlagBool("debug") {
+				if GetFlagBool("debug") {
 					xLog.Println("attempted to load ", iniFileName)
 				}
 				xLog.Printf("%s\n\t%s\n",
@@ -116,7 +116,7 @@ func InitConfig() {
 		}
 	}
 
-	if getFlagBool("debug") {
+	if GetFlagBool("debug") {
 		xLog.Printf("\n\tLoading inifile from %s\n\n", iniFileName)
 	}
 
@@ -124,7 +124,7 @@ func InitConfig() {
 	// the only value in the default section is currentSection
 	// so unless the profile is overridden, the default profile
 	// is the last profile used.
-	xData["currentSection"] = getFlagString("profile")
+	xData["currentSection"] = GetFlagString("profile")
 	xSec := loadSection(xData["currentSection"])
 	if ini.DefaultSection == xData["currentSection"] {
 		loadKey(xSec, "currentSection", true)
@@ -213,7 +213,7 @@ func msgRequiredIniKeys() {
 		"Please substitute in the correct values from the API integration page in the console application\n",
 		"Please note all keys and values are CASE SENSITIVE as token, secret, and URLs may be case sensitive")
 
-	if getFlagBool("help") {
+	if GetFlagBool("help") {
 		_, _ = fmt.Print(msg)
 	} else {
 		xLog.Print(msg)

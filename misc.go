@@ -24,24 +24,28 @@ func DeferError(f func() error) {
 	}
 }
 
-func getFlagBool(val string) bool {
-	rc, err := nFlags.GetBool(val)
+// GetFlagBool
+// Get the true/false of a boolean program flag
+func GetFlagBool(key string) (val bool) {
+	val, err := nFlags.GetBool(key)
 	if nil != err {
 		if nil != xLog {
-			xLog.Printf("error fetching value for boolean flag [ %s ]\n", val)
+			xLog.Printf("error fetching value for boolean flag [ %s ]\n", key)
 		}
 		return false
 	}
-	return rc
+	return val
 }
 
-func getFlagString(val string) string {
-	rc, err := nFlags.GetString(val)
+// GetFlagBool
+// Get the value of a boolean program flag
+func GetFlagString(key string) (val string) {
+	val, err := nFlags.GetString(key)
 	if nil != err {
 		if nil != xLog {
-			xLog.Printf("error fetching value for string flag [ %s ]\n", val)
+			xLog.Printf("error fetching value for string flag [ %s ]\n", key)
 		}
 		return ""
 	}
-	return rc
+	return val
 }
