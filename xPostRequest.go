@@ -23,6 +23,7 @@ func XPostRequest(url string, payload io.Reader) (resp []byte, err error) {
 	if nil == err {
 		defer DeferError(res.Body.Close)
 		resp, err = ioutil.ReadAll(res.Body)
+		setTimeoutExpires()
 	}
 	if GetFlagBool("debug") {
 		xLog.Println(string(resp))

@@ -31,6 +31,7 @@ var optionalKeys = [...]string{
 	"ClientID",
 	"Issued",
 	"Expires",
+	// "InactiveTimeout",
 }
 
 var xData = map[string]string{

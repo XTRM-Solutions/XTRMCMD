@@ -19,16 +19,40 @@ type tokenResponse struct {
 	Expires      string `json:".expires"`
 }
 
+// XTRM time example: "Wed, 28 Oct 2020 20:15:16 GMT"
+const xtrmTimeFormat string = "Mon, 02 Jan 2006 15:04:05 MST"
+
+var xtrmTimeout, _ = time.ParseDuration("28m")
+
+func setTimeoutExpires() {
+	xData["InactiveTimeout"] =
+		time.Now().Add(xtrmTimeout).Format(xtrmTimeFormat)
+}
+
+func checkTimeout() (isExpired bool) {
+	ts := xData["InactiveTimeout"]
+	if "" != ts {
+		timeExpires, err := time.Parse(xtrmTimeFormat, ts)
+		if nil != err || timeExpires.Before(time.Now()) {
+			return true
+		}
+		return false
+	}
+	return true
+}
+
 func isTokenActive(duration time.Duration) (active bool) {
+
+	// check inactive timeout
+	if checkTimeout() {
+		return false
+	}
 
 	// Do we already have an access token good for at least 2 hours?
 	if "" != xData["AccessToken"] {
 		// is it current?
 		expires := xData["Expires"]
 		if "" != expires {
-			// XTRM time example: "Wed, 28 Oct 2020 20:15:16 GMT"
-			xtrmTimeFormat := "Mon, 02 Jan 2006 15:04:05 MST"
-
 			timeExpires, err := time.Parse(xtrmTimeFormat, expires)
 			if nil != err {
 				xLog.Fatal("Internal error: could not parse time [ " +
@@ -50,8 +74,8 @@ func xAuthorize(xMethod, xUrl, xClient, xSecret string) (success bool) {
 		return true
 	}
 
-	// otherwise need to authorize
-	// don't see any point in using token refresh
+	// otherwise need to authorize or reauthorize
+
 	payload := strings.NewReader("grant_type=password" +
 		"&client_id=" + xClient +
 		"&client_secret=" + xSecret)
@@ -68,7 +92,6 @@ func xAuthorize(xMethod, xUrl, xClient, xSecret string) (success bool) {
 	if nil != err {
 		xLog.Fatal(err.Error())
 	}
-
 	defer DeferError(res.Body.Close)
 
 	xBody, err := io.ReadAll(res.Body)
@@ -99,8 +122,9 @@ func xAuthorize(xMethod, xUrl, xClient, xSecret string) (success bool) {
 	xData["Issued"] = tr.Issued
 	xData["Expires"] = tr.Expires
 
+	setTimeoutExpires()
+
 	writeCurrentSectionKeys()
 
 	return len(tr.AccessToken) > 0
-
 }
